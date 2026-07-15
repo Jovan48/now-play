@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Play, BarChart2, MessageCircle, DollarSign, ChevronRight, Menu, X } from "lucide-react";
+import AuthModal, { AuthMode } from "./AuthModal";
 
 const CONCERT_IMG = "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&auto=format";
 const CONCERT_IMG2 = "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=800&h=600&fit=crop&auto=format";
@@ -85,12 +86,20 @@ function WaveformSVG() {
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  function openAuth(mode: AuthMode) {
+    setAuthMode(mode);
+    setAuthOpen(true);
+    setMenuOpen(false);
+  }
 
   return (
     <div
@@ -132,15 +141,18 @@ export default function App() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => openAuth("login")}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
               Log In
-            </a>
-            <a
-              href="#"
+            </button>
+            <button
+              onClick={() => openAuth("signup")}
               className="px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:bg-[#13786a] transition-colors"
             >
               Sign Up
-            </a>
+            </button>
           </div>
 
           {/* Mobile toggle */}
@@ -162,10 +174,13 @@ export default function App() {
               </a>
             ))}
             <hr className="border-border" />
-            <a href="#" className="text-muted-foreground">Log In</a>
-            <a href="#" className="px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold text-center">
+            <button onClick={() => openAuth("login")} className="text-muted-foreground text-left">Log In</button>
+            <button
+              onClick={() => openAuth("signup")}
+              className="px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold text-center"
+            >
               Sign Up
-            </a>
+            </button>
           </div>
         )}
       </nav>
@@ -215,13 +230,13 @@ export default function App() {
               streamers, and storytellers who refuse to be ordinary.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a
-                href="#"
+              <button
+                onClick={() => openAuth("signup")}
                 className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-primary text-white font-semibold hover:bg-[#13786a] transition-all hover:scale-105 active:scale-95"
               >
                 Get Started Free
                 <ChevronRight className="w-4 h-4" />
-              </a>
+              </button>
               <a
                 href="#"
                 className="flex items-center gap-2 px-7 py-3.5 rounded-full border border-border text-foreground font-semibold hover:border-[#168978]/50 transition-colors"
@@ -438,14 +453,14 @@ export default function App() {
           <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto leading-relaxed">
             Your audience is waiting. Your revenue is untapped. The only thing missing is the right platform.
           </p>
-          <a
-            href="#"
+          <button
+            onClick={() => openAuth("signup")}
             className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-primary text-white font-bold text-lg hover:bg-[#13786a] transition-all hover:scale-105 active:scale-95"
             style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.05em" }}
           >
             Sign Up for Free
             <ChevronRight className="w-5 h-5" />
-          </a>
+          </button>
           <p className="text-muted-foreground text-sm mt-4">No credit card required · Cancel anytime</p>
         </div>
       </section>
@@ -474,6 +489,14 @@ export default function App() {
           <p className="text-muted-foreground text-xs">© 2026 Now-Play. All rights reserved.</p>
         </div>
       </footer>
+
+      {authOpen && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setAuthOpen(false)}
+          onSwitchMode={() => setAuthMode((m) => (m === "login" ? "signup" : "login"))}
+        />
+      )}
     </div>
   );
 }
